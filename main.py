@@ -64,25 +64,43 @@ def win_rate(results, alt_results, alt_sigma):
   
   win /= trials
   win_sem = np.std(int(win*trials)*[1]+int((1-win)*trials)*[0]) / trials ** 0.5
+  # Is there any significance to sample std dev? (i.e., not SEM)
+  win_sem = round(win_sem, int(np.log10(trials)))
   
-  print(win, "+/-", round(win_sem,int(np.log10(trials))))
+  #print(win, "+/-", round(win_sem,int(np.log10(trials))))
+  return win, win_sem
 
-def compare(years):
+def compare(years, summary=False):
   #years = 5
-  mu = 0.1
+  mu = 0.095
   sigma = 0.15
   # exp(0.0488) ~ 1.05
   # exp(0.0677) ~ 1.07
   # exp(0.0793) ~ 1.0825
-  alt_mu = 0.05
+  alt_mu = 0.0793
   alt_sigma = 0
   alt_results = roi_dstr(years, alt_mu, alt_sigma)
   results = roi_dstr(years, mu, sigma)
-  summarize(results)
-  win_rate(results, alt_results, alt_sigma)
+  trials = len(results)
+  win, win_sem = win_rate(results, alt_results, alt_sigma)
+  if summary:
+    summarize(results)
+    print(win, "+/-", round(win_sem,int(np.log10(trials))))
+  return win, win_sem
 
 if __name__ == "__main__":
-  compare(5)
+  #compare(5, summary=True)
+  # TODO another graph can show the ROI for each strat rather than just win rate
+  # TODO multiplot to show effect of diff mu, sigma (or plots with diff axes)
+  step = 2
+  stop = 30
+  years = np.arange(step, stop, step)
+  win = [None for _ in years]
+  win_sem = [None for _ in years]
+  for i in range(len(years)):
+    win[i], win_sem[i] = compare(years[i])
+  plt.errorbar(years, win, win_sem) 
+  plt.show()
 
 
 
