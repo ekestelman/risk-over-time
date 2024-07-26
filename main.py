@@ -7,31 +7,6 @@ import time
 def roi_dstr(years, mu, sigma, trials=10000, principle=1e3):
 # Distribution of possible returns on investment.
 # TODO trials should be int
-  #years = 5
-  #principle = 1e3
-  #mu = 0.1
-  #sigma = 0.15
-  #trials = 10000
-
-##alt_mu = .0488  # 5% APY
-#alt_mu = .0793  # 8.25% APY
-#alt_mu = mu
-#alt_sigma = 0
-#
-#start = time.time()
-#
-#if alt_sigma:
-#  alt_results = [None for _ in range(trials)]
-#  for i in range(trials):
-#    alt_balance = principle
-#    for j in range(years):
-#      alt_balance *= np.random.lognormal(alt_mu, alt_sigma)
-#    alt_results[i] = alt_balance
-#else:
-#  alt_results = principle * np.exp(alt_mu*years)# for _ in range(trials)]
-#
-#stop = time.time()
-#print("alt loop", stop-start)
 
   start = time.time()
   
@@ -46,7 +21,7 @@ def roi_dstr(years, mu, sigma, trials=10000, principle=1e3):
     results = principle * np.exp(mu*years)
   
   stop = time.time()
-  print("main loop", stop-start)
+  #print("main loop", stop-start)
 
   return results
 
@@ -85,23 +60,30 @@ def win_rate(results, alt_results, alt_sigma):
         win += 1
   
   end = time.time()
-  print("win loop", end - start)
+  #print("win loop", end - start)
   
   win /= trials
   win_sem = np.std(int(win*trials)*[1]+int((1-win)*trials)*[0]) / trials ** 0.5
   
   print(win, "+/-", round(win_sem,int(np.log10(trials))))
 
-if __name__ == "__main__":
-  years = 5
+def compare(years):
+  #years = 5
   mu = 0.1
   sigma = 0.15
-  alt_mu = 0.07
+  # exp(0.0488) ~ 1.05
+  # exp(0.0677) ~ 1.07
+  # exp(0.0793) ~ 1.0825
+  alt_mu = 0.05
   alt_sigma = 0
   alt_results = roi_dstr(years, alt_mu, alt_sigma)
   results = roi_dstr(years, mu, sigma)
   summarize(results)
   win_rate(results, alt_results, alt_sigma)
+
+if __name__ == "__main__":
+  compare(5)
+
 
 
 
