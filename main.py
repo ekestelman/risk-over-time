@@ -63,7 +63,8 @@ def win_rate(results, alt_results, alt_sigma):
   #print("win loop", end - start)
   
   win /= trials
-  win_sem = np.std(int(win*trials)*[1]+int((1-win)*trials)*[0]) / trials ** 0.5
+  win_sem = np.std(int(win*trials)*[1]+int((1-win)*trials)*[0], ddof=1) / \
+            trials ** 0.5
   # Is there any significance to sample std dev? (i.e., not SEM)
   win_sem = round(win_sem, int(np.log10(trials)))
   
@@ -72,36 +73,48 @@ def win_rate(results, alt_results, alt_sigma):
 
 def compare(years, summary=False):
   #years = 5
+  principle = 1e3
   mu = 0.095
   sigma = 0.15
   # exp(0.0488) ~ 1.05
   # exp(0.0677) ~ 1.07
   # exp(0.0793) ~ 1.0825
-  alt_mu = 0.0793
-  alt_sigma = 0
+  alt_mu = 0.08
+  alt_sigma = 0.01
   alt_results = roi_dstr(years, alt_mu, alt_sigma)
   results = roi_dstr(years, mu, sigma)
   trials = len(results)
   win, win_sem = win_rate(results, alt_results, alt_sigma)
   if summary:
+    print("Strat A")
     summarize(results)
-    print(win, "+/-", round(win_sem,int(np.log10(trials))))
+    print("\nStrat B")
+    if alt_sigma:
+      summarize(alt_results)
+    else:
+      print(principle * np.exp(alt_mu*years))
+      # TODO better handling of principle arg
+      # TODO consider defining mu differently (APY vs APR)
+    print("\nP(A>B): ", win, "+/-", \
+          round(win_sem,int(np.log10(trials))))
   return win, win_sem
 
-if __name__ == "__main__":
-  #compare(5, summary=True)
-  # TODO another graph can show the ROI for each strat rather than just win rate
-  # TODO multiplot to show effect of diff mu, sigma (or plots with diff axes)
-  step = 2
-  stop = 30
-  years = np.arange(step, stop, step)
+def yearly_plot(stop, step, start=0):
+  # TODO allow different start to be set
+  years = np.arange(step, stop+step, step)
   win = [None for _ in years]
   win_sem = [None for _ in years]
   for i in range(len(years)):
     win[i], win_sem[i] = compare(years[i])
   plt.errorbar(years, win, win_sem) 
   plt.show()
+  
 
+if __name__ == "__main__":
+  # TODO another graph can show the ROI for each strat rather than just win rate
+  # TODO multiplot to show effect of diff mu, sigma (or plots with diff axes)
+  #yearly_plot(30, 2)
+  compare(1, summary=True)
 
 
 
