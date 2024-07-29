@@ -1,21 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-from strats_module import *#Two_Strats
 
 # TODO clargs to output compuation time
-
-'''
-class Two_Strats:
-  def __init__(self, mu, sigma, alt_mu, alt_sigma=0, years=1, principle=1e3, \
-               trials=10000):
-    self.mu = mu
-    self.sigma = sigma
-    self.alt_mu = alt_mu
-    self.alt_sigma = alt_sigma
-    self.years = years
-    self.principle = principle
-    self.trials = trials
 
 def roi_dstr(years, mu, sigma, trials=10000, principle=1e3):
 # Distribution of possible returns on investment.
@@ -23,6 +10,8 @@ def roi_dstr(years, mu, sigma, trials=10000, principle=1e3):
 
   start = time.time()
   
+  # XXX sigma is not replaceable with self.sigma since it also stands in for 
+  # alt_sigma.
   if sigma:
     results = [None for _ in range(trials)]
     for i in range(trials):
@@ -31,7 +20,7 @@ def roi_dstr(years, mu, sigma, trials=10000, principle=1e3):
         balance *= np.random.lognormal(mu, sigma)
       results[i] = balance
   else:
-    results = principle * np.exp(mu*years)
+    results = [principle * np.exp(mu*years)]
   
   stop = time.time()
   #print("main loop", stop-start)
@@ -49,27 +38,29 @@ def summarize(results):
 
   summary["sem"] = summary["std_unbiased"] / trials ** 0.5  # std error on mean
   
+  return summary
+
+def print_summary(summary):
   for x in summary:
     summary[x] = round(summary[x], 2)
   
   print("Mean:", summary["mean"], "+/-", summary["sem"])
   print("Sample standard deviation:", summary["std_unbiased"])
-  return summary
 
-def win_rate(results, alt_results, alt_sigma):
+def win_rate(results, alt_results):#, alt_sigma):
 
   trials = len(results)
   win = 0
   
   start = time.time()
   
-  if alt_sigma:
+  if len(alt_results) > 1:
     for i in range(trials):
       if results[i] > alt_results[i]:
         win += 1
   else:
     for i in range(trials):
-      if results[i] > alt_results:
+      if results[i] > alt_results[0]:
         win += 1
   
   end = time.time()
@@ -85,25 +76,26 @@ def win_rate(results, alt_results, alt_sigma):
   #print(win, "+/-", round(win_sem,int(np.log10(trials))))
   return win, win_sem
 
-def compare(years, summary=False):
-  #years = 5
-  principle = 1e3
-  mu = 0.095
-  sigma = 0.15
-  # exp(0.0488) ~ 1.05
-  # exp(0.0677) ~ 1.07
-  # exp(0.0793) ~ 1.0825
-  alt_mu = 0.05
-  alt_sigma = 0.01
-  alt_results = roi_dstr(years, alt_mu, alt_sigma)
-  results = roi_dstr(years, mu, sigma)
+#def compare(years, summary=False):
+def compare(results, alt_results, summary=False):#years, summary=False):
+  ##years = 5
+  #principle = 1e3
+  #mu = 0.095
+  #sigma = 0.15
+  ## exp(0.0488) ~ 1.05
+  ## exp(0.0677) ~ 1.07
+  ## exp(0.0793) ~ 1.0825
+  #alt_mu = 0.05
+  #alt_sigma = 0.01
+  #alt_results = roi_dstr(years, alt_mu, alt_sigma)
+  #results = roi_dstr(years, mu, sigma)
   trials = len(results)
-  win, win_sem = win_rate(results, alt_results, alt_sigma)
+  win, win_sem = win_rate(results, alt_results)#, alt_sigma)
   if summary:
     print("Strat A")
     summarize(results)
     print("\nStrat B")
-    if alt_sigma:
+    if len(alt_results)>1:  # TODO what happens if we summarize len 1 results?
       summarize(alt_results)
     else:
       print(principle * np.exp(alt_mu*years))
@@ -113,29 +105,63 @@ def compare(years, summary=False):
           round(win_sem,int(np.log10(trials))))
   return win, win_sem
 
-def yearly_plot(stop, step, start=0):
+def yearly_plot(strat1, strat2, stop, step, start=0):
   # TODO allow different start to be set
   years = np.arange(step, stop+step, step)
   win = [None for _ in years]
   win_sem = [None for _ in years]
   for i in range(len(years)):
-    win[i], win_sem[i] = compare(years[i])
+    strat1.recalc(years[i])
+    strat2.recalc(years[i])
+    win[i], win_sem[i] = compare(strat1.roi_dstr, strat2.roi_dstr)
+    # compare now takes results, not years. years needs to pass through strat obj
+    # needs to make new strat object on each loop, or alter existing strat results
   plt.errorbar(years, win, win_sem) 
   plt.show()
-  '''
+  
+class Two_Strats:
+  def __init__(self, mu, sigma, alt_mu, alt_sigma=0, years=1, principle=1e3, \
+               trials=10000):
+    self.mu = mu
+    self.sigma = sigma
+    self.alt_mu = alt_mu
+    self.alt_sigma = alt_sigma
+    self.years = years
+    self.principle = principle
+    self.trials = trials
+    self.results = roi_dstr(self.years, self.mu, self.sigma, self.trials, \
+                            self.principle)
+    self.alt_results = roi_dstr(self.years, self.alt_mu, self.alt_sigma, \
+                                self.trials, self.principle)
+    self.summary = summarize(self.results)
+    if alt_sigma:
+      self.alt_summary = summarize(self.alt_results)
+
+class Strat:
+  def __init__(self, mu, sigma=0, years=1, principle=1e3, trials=10000):
+    self.mu = mu
+    self.sigma = sigma
+    self.years = years
+    self.principle = principle
+    self.trials = trials
+    # TODO Below could be extracted to recalc (or calc) method.
+    self.roi_dstr = roi_dstr(years, mu, sigma, trials, principle)
+    self.summary = summarize(self.roi_dstr)
+
+  def print_summary(self):
+    print_summary(self.summary)
+
+  def recalc(self, years):
+    self.years = years
+    self.roi_dstr = roi_dstr(years, self.mu, self.sigma, self.trials, \
+                             self.principle)
+    self.summary = summarize(self.roi_dstr)
 
 if __name__ == "__main__":
   # TODO another graph can show the ROI for each strat rather than just win rate
   # TODO multiplot to show effect of diff mu, sigma (or plots with diff axes)
   #yearly_plot(30, 2)
-  #compare(1, summary=True)
-  #test_strat = Two_Strats(.1, .15, .05)
-  strat1 = Strat(.1, .15)
-  strat1.print_summary()
-  strat2 = Strat(.09, .1)
-  strat2.print_summary()
-  compare(strat1.roi_dstr, strat2.roi_dstr, summary=True)
-  yearly_plot(strat1, strat2, 30, 2)
+  compare(1, summary=True)
 
 
 
