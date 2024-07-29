@@ -130,12 +130,22 @@ if __name__ == "__main__":
   #yearly_plot(30, 2)
   #compare(1, summary=True)
   #test_strat = Two_Strats(.1, .15, .05)
-  strat1 = Strat(.1, .15)
+  years = 10
+  strat1 = Strat(.1, .15, years=years)
   strat1.print_summary()
-  strat2 = Strat(.09, .1)
+  strat2 = Strat(.09, .1, years=years)
   strat2.print_summary()
   compare(strat1.roi_dstr, strat2.roi_dstr, summary=True)
-  yearly_plot(strat1, strat2, 30, 2)
+  #yearly_plot(strat1, strat2, 30, 2)
+  #plt.hist(strat1.roi_dstr, 50, histtype="step") #density=True/False
+  #plt.hist(strat2.roi_dstr, 50, histtype="step") #density=True/False
+  strats = [strat1.roi_dstr, strat2.roi_dstr]
+  plt.hist(strats, 50)
+  # TODO chance of being above/below a benchmark for each strat?
+  # e.g., better chance that strat 2 > 5% but better chance that strat 1 > 15%.
+  #pdf = np.exp(-(np.log(x) - mu)**2 / (2 * sigma**2)) \
+  #      / (x * sigma * (2 * np.pi)**0.5)
+  plt.show()
 
 
 
