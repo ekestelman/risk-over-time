@@ -33,6 +33,8 @@ if __name__ == "__main__":
   pdf = np.exp(-(np.log(x/principle) - mu)**2 / (2 * sigma**2)) \
         / (x/principle * sigma * (2 * np.pi)**0.5) / principle
   plt.plot(x, pdf)
+  plt.plot(*strat2.pdf())
+  # Funny output if dereference is omitted
   plt.show()
 
 

@@ -147,21 +147,32 @@ class Strat:
     # TODO Below could be extracted to recalc (or calc) method.
     self.roi_dstr = roi_dstr(years, mu, sigma, trials, principle)
     self.summary = summarize(self.roi_dstr)
+    # ^Should this be a method?
 
   def print_summary(self):
     print_summary(self.summary)
 
-  def recalc(self, years):
+  def recalc(self, years): # Use years=self.years if we extract roi_dstr?
     self.years = years
     self.roi_dstr = roi_dstr(years, self.mu, self.sigma, self.trials, \
                              self.principle)
     self.summary = summarize(self.roi_dstr)
 
+  def pdf(self):
+    x = np.linspace(min(self.roi_dstr), max(self.roi_dstr), 1000)
+    years, principle = self.years, self.principle
+    mu, sigma = self.mu * years, self.sigma * years**0.5
+    # Theoretical PDF, not fit to simulated data.
+    pdf = np.exp(-(np.log(x/principle) - mu)**2 / (2 * sigma**2)) / \
+          (x/principle * sigma * (2 * np.pi)**0.5) / principle
+    return x, pdf  # Return x and pdf for easy plotting.
+    # Funny output if dereference is omitted when plotting.
+    # Clearer to have one function return x and another return pdf?
+
 if __name__ == "__main__":
   # TODO another graph can show the ROI for each strat rather than just win rate
   # TODO multiplot to show effect of diff mu, sigma (or plots with diff axes)
-  #yearly_plot(30, 2)
-  compare(1, summary=True)
+  pass
 
 
 
