@@ -15,6 +15,11 @@ if __name__ == "__main__":
   strat2 = Strat(.09, .1, years=years, principle=principle)
   strat2.print_summary()
   compare(strat1.roi_dstr, strat2.roi_dstr, summary=True)
+  # TODO Add function analogous to compare/summary for benchmark.
+  # Can yearly_plot() still accept sigma=0 strat as argument?
+  # TODO exp graph with shaded area of x% confidence interval
+  benchmark = 1.07
+  benchmark = benchmark**years * principle
   #yearly_plot(strat1, strat2, 30, 2)
   #plt.hist(strat1.roi_dstr, 50, histtype="step") #density=True/False
   #plt.hist(strat2.roi_dstr, 50, histtype="step") #density=True/False
@@ -40,6 +45,8 @@ if __name__ == "__main__":
   plt.plot(x, pdf)
   plt.plot(*strat2.pdf())
   # Funny output if dereference is omitted
+  # TODO make ymax a bit greater than the highest point of either PDF.
+  plt.vlines(benchmark, 0, 2*max(pdf), color="black", linestyles="--")
   plt.show()
 
 
