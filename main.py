@@ -8,7 +8,7 @@ from strats_module import *#Two_Strats
 if __name__ == "__main__":
   # TODO another graph can show the ROI for each strat rather than just win rate
   # TODO multiplot to show effect of diff mu, sigma (or plots with diff axes)
-  years = 20
+  years = 30
   principle = 1000
   strat1 = Strat(.1, .15, years=years, principle=principle)
   strat1.print_summary()
@@ -19,7 +19,12 @@ if __name__ == "__main__":
   #plt.hist(strat1.roi_dstr, 50, histtype="step") #density=True/False
   #plt.hist(strat2.roi_dstr, 50, histtype="step") #density=True/False
   strats = [strat1.roi_dstr, strat2.roi_dstr]
-  plt.hist(strats, 40, density=True)
+  #plt.hist(strats, 40, density=True)
+  # More bins if years is higher to accomodate more spread.
+  # Factor of ~20 makes bars fit curve more accurately but looks messy.
+  # Consider interactive plot: toggle curve, nbins.
+  # Consider excluding outlying results, consider log plot for long time scales.
+  plt.hist(strats, 15 * int(strat1.years**0.5), density=True)
   # TODO chance of being above/below a benchmark for each strat?
   # e.g., better chance that strat 2 > 5% but better chance that strat 1 > 15%.
   # ^CDF plot may basically demonstrate this.
