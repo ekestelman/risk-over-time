@@ -41,7 +41,7 @@ if __name__ == "__main__":
   #      / (x * sigma * (2 * np.pi)**0.5)
   #plt.plot(x*principle, pdf)
   x = np.linspace(min(strats[0]), max(strats[0]), 1000)
-  mu, sigma = strat1.mu * years, strat1.sigma * years**0.5
+  mu, sigma = strat1.mu * strat1.years, strat1.sigma * strat1.years**0.5
   pdf = np.exp(-(np.log(x/principle) - mu)**2 / (2 * sigma**2)) \
         / (x/principle * sigma * (2 * np.pi)**0.5) / principle
   plt.plot(x, pdf)
