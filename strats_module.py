@@ -159,6 +159,7 @@ class Strat:
     self.summary = summarize(self.roi_dstr)
 
   def pdf(self):
+    # Can use pdf from scipy.
     x = np.linspace(min(self.roi_dstr), max(self.roi_dstr), 1000)
     years, principle = self.years, self.principle
     mu, sigma = self.mu * years, self.sigma * years**0.5
@@ -168,6 +169,27 @@ class Strat:
     return x, pdf  # Return x and pdf for easy plotting.
     # Funny output if dereference is omitted when plotting.
     # Clearer to have one function return x and another return pdf?
+
+  def dstr_over_time(self, years=0):
+    if not years:
+      years = self.years   # Better way to set default?
+    # Default year range to years attribute, option to set different range.
+    interval = 0.5  # Get the middle 50% of results.
+    interval /= 2   # For later arithmetic.
+    mid = []
+    high = []
+    low = []
+    # TODO way to skip years like in yearly_plot
+    for i in range(years):
+      self.recalc(i)
+      dstr = self.roi_dstr
+      mid.append(np.median(dstr))
+      low.append(np.quantile(dstr, interval))
+      high.append(np.quantile(dstr, 1-interval))
+    plt.plot(mid)
+    plt.plot(high)
+    plt.plot(low)
+    plt.show()
 
 if __name__ == "__main__":
   # TODO another graph can show the ROI for each strat rather than just win rate
