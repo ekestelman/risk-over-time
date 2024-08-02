@@ -170,7 +170,7 @@ class Strat:
     # Funny output if dereference is omitted when plotting.
     # Clearer to have one function return x and another return pdf?
 
-  def dstr_over_time(self, years=0):
+  def dstr_over_time(self, years=0, normalize=False):
     if not years:
       years = self.years   # Better way to set default?
     # Default year range to years attribute, option to set different range.
@@ -179,16 +179,31 @@ class Strat:
     mid = []
     high = []
     low = []
+    curves = [low, mid, high]
     # TODO way to skip years like in yearly_plot
-    for i in range(years):
+    step = 1
+    # FIXME use similar soln to yearly_plot for years messing up in plot if
+    # step > 1. Even better: more generalized yearly plot (sub)function.
+    #for i in range(step, years, step): # Causes other problems (loop should not start at step or jump.
+    # Do functions work as expected if years=0?
+    # Faster to start loop at 1 (0 is trivially).
+    for i in range(years+1):
       self.recalc(i)
       dstr = self.roi_dstr
       mid.append(np.median(dstr))
       low.append(np.quantile(dstr, interval))
       high.append(np.quantile(dstr, 1-interval))
-    plt.plot(mid)
-    plt.plot(high)
-    plt.plot(low)
+    for elm in curves:
+      if normalize:
+        elm = [_ / self.principle for _ in elm]
+      plt.plot(elm)
+    #for i in range(3):
+    #  if normalize:
+    #    curves[i] = [_ / self.principle for _ in curves[i]]
+    #  plt.plot(curves[i])
+    #plt.plot(mid)
+    #plt.plot(high)
+    #plt.plot(low)
     plt.show()
 
 if __name__ == "__main__":

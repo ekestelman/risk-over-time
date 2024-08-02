@@ -21,7 +21,8 @@ if __name__ == "__main__":
   benchmark = 1.07
   benchmark = benchmark**years * principle
   #yearly_plot(strat1, strat2, 30, 2)
-  strat1.dstr_over_time()  # TODO test different years set earlier or as arg
+  strat1.dstr_over_time(years=15, normalize=True)  # TODO test different years set earlier or as arg
+  # XXX Using years different from previoulsy set years will mess up other graphs.
   #plt.hist(strat1.roi_dstr, 50, histtype="step") #density=True/False
   #plt.hist(strat2.roi_dstr, 50, histtype="step") #density=True/False
   strats = [strat1.roi_dstr, strat2.roi_dstr]
