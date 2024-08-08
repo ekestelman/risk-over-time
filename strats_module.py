@@ -71,6 +71,9 @@ def win_rate(results, alt_results):#, alt_sigma):
             trials ** 0.5
   # Is there any significance to sample std dev? (i.e., not SEM)
   # XXX validate use of this statistic
+  # SEM is for uncertainty on the ratio, good for when ratio is based on
+  # random sampling. Std dev may still mean something when ratio is computed
+  # analytically?
   win_sem = round(win_sem, int(np.log10(trials)))
   
   #print(win, "+/-", round(win_sem,int(np.log10(trials))))
@@ -169,6 +172,32 @@ class Strat:
     return x, pdf  # Return x and pdf for easy plotting.
     # Funny output if dereference is omitted when plotting.
     # Clearer to have one function return x and another return pdf?
+
+  def cdf(self):
+    # cdf from scipy? Or implement cdf (analytical)
+    # Can produce cdf analytically or numerically
+    pass
+
+  def cum_dstr(self, reverse=False):
+    # Numerical version of cdf()
+    # Cumulative version of roi_dstr
+    # Probability of yielding at least x.
+    # Use reverse kwarg to give probability of yielding less than some amount.
+    self.roi_dstr.sort() # Check scope. # Should we do this earlier?
+    x = np.linspace(0, self.roi_dstr[-1], 100) # max(roi_dstr) if sorted
+    y = [0 for _ in x]
+    i = 0
+    j = 0
+    for i in range(len(x)):
+      y[i] = y[i-1]             # 0 on first iter
+      while self.roi_dstr[j] < x[i]:
+        y[i] += 1
+        j += 1
+    print(self.years)
+    return x, y
+    # Funny output if dereference is omitted when plotting.
+    #plt.plot(x,y)
+    #plt.show()
 
   def dstr_over_time(self, years=0, normalize=False):
     if not years:
