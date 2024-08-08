@@ -182,9 +182,9 @@ class Strat:
     # Numerical version of cdf()
     # Cumulative version of roi_dstr
     # Probability of yielding at least x.
-    # Use reverse kwarg to give probability of yielding less than some amount.
+    # Use reverse kwarg to give probability of yielding at least some amount.
     self.roi_dstr.sort() # Check scope. # Should we do this earlier?
-    x = np.linspace(0, self.roi_dstr[-1], 100) # max(roi_dstr) if sorted
+    x = np.linspace(0, self.roi_dstr[-1], 1000) # max(roi_dstr) if sorted
     y = [0 for _ in x]
     i = 0
     j = 0
@@ -193,7 +193,8 @@ class Strat:
       while self.roi_dstr[j] < x[i]:
         y[i] += 1
         j += 1
-    print(self.years)
+    y = [elm / self.trials for elm in y]
+    #print(self.years)
     return x, y
     # Funny output if dereference is omitted when plotting.
     #plt.plot(x,y)
