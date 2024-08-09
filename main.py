@@ -67,8 +67,15 @@ if __name__ == "__main__":
   #  plt.plot(elm.cum_dstr())
   # TODO show points of intersection on CDF plot? (Consider the interpretation
   # of this statistic.)
-  plt.plot(*strat1.cum_dstr())  # Maybe strats = [strat1, strat2]
-  plt.plot(*strat2.cum_dstr())
+  inverse = True
+  plt.plot(*strat1.cum_dstr(inverse))  # Maybe strats = [strat1, strat2]
+  plt.plot(*strat2.cum_dstr(inverse))
+  plt.xlabel("Amount")
+  # Math print for ylabel?
+  if inverse:
+    plt.ylabel("P(>x)")
+  else:
+    plt.ylabel("P(<x)")
   plt.show()
 
 
