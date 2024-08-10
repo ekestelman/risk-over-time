@@ -92,12 +92,17 @@ def compare(results, alt_results, summary=False):#years, summary=False):
     print("Strat A")
     print_summary(summarize(results))
     print("\nStrat B")
-    if len(alt_results)>1:  # TODO what happens if we summarize len 1 results?
-      print_summary(summarize(alt_results))
-    else:
-      print(alt_results.principle * np.exp(alt_mu*years))
-      # TODO better handling of principle arg
-      # TODO consider defining mu differently (APY vs APR)
+    print_summary(summarize(alt_results))
+    # What happens if we summarize len 1 results?
+    # ^Output is coherent but has +/- nan for std dev of list with len 1.
+    # FIXME nonfatal runtime error from nan std dev
+    # TODO Improved handling of sigma=0 strats should be handled by
+    # print_summary.
+    # XXX this works pretty well for sigma=0 on strat2 but other graphsi
+    # are wonky
+    # alt_result is strat2.roi_dstr. What does this return when sigma=0?
+    # (Returns what we want)
+    # TODO consider defining mu differently (APY vs APR)
     print("\nP(A>B): ", win, "+/-", \
           round(win_sem,int(np.log10(trials))))
   return win, win_sem
