@@ -2,16 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
-# TODO clargs to output compuation time
-
 def roi_dstr(years, mu, sigma, trials=10000, principle=1e3):
 # Distribution of possible returns on investment.
 # TODO trials should be int
 
-  start = time.time()
-  
   # XXX sigma is not replaceable with self.sigma since it also stands in for 
   # alt_sigma.
+  # ^Relevant for older Two_Strats class, not for current Strats class?
   if sigma:
     results = [None for _ in range(trials)]
     for i in range(trials):
@@ -22,11 +19,9 @@ def roi_dstr(years, mu, sigma, trials=10000, principle=1e3):
   else:
     results = [principle * np.exp(mu*years)]
   
-  stop = time.time()
-  #print("main loop", stop-start)
-
   return results
 
+# XXX Get rid of this, integrate it into print_summary()
 def summarize(results):
   summary = {
              "mean" : np.mean(results),
@@ -37,22 +32,24 @@ def summarize(results):
   trials = len(results)
 
   summary["sem"] = summary["std_unbiased"] / trials ** 0.5  # std error on mean
+  # Worth having a SEM function? Scipy has it.
   
   return summary
 
+# XXX No use having this outside class method
 def print_summary(summary):
   for x in summary:
     summary[x] = round(summary[x], 2)
   
   print("Mean:", summary["mean"], "+/-", summary["sem"])
   print("Sample standard deviation:", summary["std_unbiased"])
+  # std may not be a very useful statistic for a lognormal distribution, may
+  # not provide the same intuition as in normal.
 
-def win_rate(results, alt_results):#, alt_sigma):
+def win_rate(results, alt_results):
 
   trials = len(results)
   win = 0
-  
-  start = time.time()
   
   if len(alt_results) > 1:
     for i in range(trials):
@@ -63,14 +60,11 @@ def win_rate(results, alt_results):#, alt_sigma):
       if results[i] > alt_results[0]:
         win += 1
   
-  end = time.time()
-  #print("win loop", end - start)
-  
   win /= trials
   win_sem = np.std(int(win*trials)*[1]+int((1-win)*trials)*[0], ddof=1) / \
             trials ** 0.5
   # Is there any significance to sample std dev? (i.e., not SEM)
-  # XXX validate use of this statistic
+  # Validate use of this statistic
   # SEM is for uncertainty on the ratio, good for when ratio is based on
   # random sampling. Std dev may still mean something when ratio is computed
   # analytically?
@@ -96,12 +90,12 @@ def compare(results, alt_results, summary=False):#years, summary=False):
   win, win_sem = win_rate(results, alt_results)#, alt_sigma)
   if summary:
     print("Strat A")
-    summarize(results)
+    print_summary(summarize(results))
     print("\nStrat B")
     if len(alt_results)>1:  # TODO what happens if we summarize len 1 results?
-      summarize(alt_results)
+      print_summary(summarize(alt_results))
     else:
-      print(principle * np.exp(alt_mu*years))
+      print(alt_results.principle * np.exp(alt_mu*years))
       # TODO better handling of principle arg
       # TODO consider defining mu differently (APY vs APR)
     print("\nP(A>B): ", win, "+/-", \
@@ -122,7 +116,7 @@ def yearly_plot(strat1, strat2, stop, step, start=0):
   plt.errorbar(years, win, win_sem) 
   plt.show()
   
-class Two_Strats:
+class Two_Strats:  # From previous draft---not in use.
   def __init__(self, mu, sigma, alt_mu, alt_sigma=0, years=1, principle=1e3, \
                trials=10000):
     self.mu = mu
@@ -141,6 +135,8 @@ class Two_Strats:
       self.alt_summary = summarize(self.alt_results)
 
 class Strat:
+  # TODO method to plot pdf, cdf, etc. along with another strat object passed
+  # as arg
   def __init__(self, mu, sigma=0, years=1, principle=1e3, trials=10000):
     self.mu = mu
     self.sigma = sigma
@@ -228,9 +224,12 @@ class Strat:
       mid.append(np.median(dstr))
       low.append(np.quantile(dstr, interval))
       high.append(np.quantile(dstr, 1-interval))
+      # Confirm that curves list is behaving as expected
     for elm in curves:
+      # Use nested list comprehension?
       if normalize:
         elm = [_ / self.principle for _ in elm]
+        # Confirm the elements are changing as expected
       plt.plot(elm)
     #for i in range(3):
     #  if normalize:
