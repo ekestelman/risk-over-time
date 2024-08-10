@@ -26,7 +26,7 @@ if __name__ == "__main__":
   # TODO Add function analogous to compare/summary for benchmark.
   # Can yearly_plot() still accept sigma=0 strat as argument?
   # TODO exp graph with shaded area of x% confidence interval
-  benchmark = 1.07
+  benchmark = 1.0825
   # TODO include growing benchmark in quantile plot
   benchmark = benchmark**years * principle
   #yearly_plot(strat1, strat2, 30, 2)
@@ -76,6 +76,7 @@ if __name__ == "__main__":
     plt.ylabel("P(>x)")
   else:
     plt.ylabel("P(<x)")
+  plt.vlines(benchmark, 0, 1, color="black", linestyles="--")
   plt.show()
 
 
