@@ -89,9 +89,9 @@ def compare(results, alt_results, summary=False):#years, summary=False):
   trials = len(results)
   win, win_sem = win_rate(results, alt_results)#, alt_sigma)
   if summary:
-    print("Strat A")
+    print("---Strat A---")
     print_summary(summarize(results))
-    print("\nStrat B")
+    print("\n---Strat B---")
     print_summary(summarize(alt_results))
     # What happens if we summarize len 1 results?
     # ^Output is coherent but has +/- nan for std dev of list with len 1.
@@ -149,6 +149,8 @@ class Strat:
     self.principle = principle
     self.trials = trials
     # TODO Below could be extracted to recalc (or calc) method.
+    # Can roi_dstr be optional in init? Want to initialize object before
+    # deciding years
     self.roi_dstr = roi_dstr(years, mu, sigma, trials, principle)
     self.summary = summarize(self.roi_dstr)
     # ^Should this be a method?
