@@ -16,11 +16,27 @@ from strats_module import *#Two_Strats
 if __name__ == "__main__":
   # TODO another graph can show the ROI for each strat rather than just win rate
   # TODO multiplot to show effect of diff mu, sigma (or plots with diff axes)
-  years = 30
-  principle = 1000
-  strat1 = Strat(.1, .15, years=years, principle=principle)
+  # Consider click library for inputs
+  years = int(input("Years (int): ") or 10)
+  principle = int(input("Principle (int): ") or 1)
+  params1 = (input("Mean and standard deviation (space separated): ") or
+             "0.1 0.15").split()
+  params2 = (input("Mean and standard deviation (space separated): ") or
+             "0.09 0.1").split()
+  params1 = [float(x) for x in params1]
+  params2 = [float(x) for x in params2]
+  # TODO Default to skipping params2? Use 0 0 to skip? Or X?
+  #show = input("What do you want to display?\n
+  #              a) Compare expected value and standard deviation\n
+  #              b) ...")
+  # TODO initialize strat objects, promt user for mean and std dev (then ask
+  # what to display). See when calculations are performed in objects.
+  # save computations.
+  #strat1 = Strat(.1, .15, years=years, principle=principle)
+  strat1 = Strat(*params1, years=years, principle=principle)
   strat1.print_summary()
-  strat2 = Strat(.09, .1, years=years, principle=principle)
+  #strat2 = Strat(.09, .1, years=years, principle=principle)
+  strat2 = Strat(*params2, years=years, principle=principle)
   strat2.print_summary()
   compare(strat1.roi_dstr, strat2.roi_dstr, summary=True)
   # TODO Add function analogous to compare/summary for benchmark.
