@@ -212,7 +212,7 @@ class Strat:
     if not years:
       years = self.years   # Better way to set default?
     # Default year range to years attribute, option to set different range.
-    interval = 0.5  # Get the middle 50% of results.
+    interval = 0.9  # Get the middle 50% of results.
     interval /= 2   # For later arithmetic.
     mid = []
     high = []
@@ -229,8 +229,8 @@ class Strat:
       self.recalc(i)
       dstr = self.roi_dstr
       mid.append(np.median(dstr))
-      low.append(np.quantile(dstr, interval))
-      high.append(np.quantile(dstr, 1-interval))
+      low.append(np.quantile(dstr, 0.5 + interval))
+      high.append(np.quantile(dstr, 0.5 - interval))
       # Confirm that curves list is behaving as expected
     for elm in curves:
       # Use nested list comprehension?
