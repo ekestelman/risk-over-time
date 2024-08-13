@@ -33,7 +33,9 @@ if __name__ == "__main__":
                "b) Show growth confidence interval over time\n" +
                "c) Show PDF after time t\n" +
                "d) Show CDF after time t\n" +
+               "e) Chance of strat A outperforming strat B over time\n" +
                "> ")
+  # TODO we can display analyses in order that they are written?
   # TODO initialize strat objects, promt user for mean and std dev (then ask
   # what to display). See when calculations are performed in objects.
   # save computations.
@@ -50,9 +52,15 @@ if __name__ == "__main__":
   # TODO exp graph with shaded area of x% confidence interval
   # TODO include growing benchmark in quantile plot
   benchmark = benchmark**years * principle
-  #yearly_plot(strat1, strat2, 30, 2)
+  if 'e' in show:
+    yearly_plot(strat1, strat2, 30, 2)
+    strat1.recalc(years)
+    strat2.recalc(years)
+    # Need to recalc after any plot that performs recalc over different years
+    # And/or move this later
   # Prompt user for time frame? Make bigger, can zoom anyway?
   # Slow with numerical method...
+  # Prompt user for confidence interval? Interactive plot?
   if 'b' in show:
     strat1.dstr_over_time(years=15, normalize=True)
   # Not the best name for this method... quantiles_over_time?
@@ -95,7 +103,7 @@ if __name__ == "__main__":
   # TODO show points of intersection on CDF plot? (Consider the interpretation
   # of this statistic.)
   if 'd' in show:
-    inverse = True
+    inverse = True # TODO Prompt user or show both plots?
     plt.plot(*strat1.cum_dstr(inverse))  # Maybe strats = [strat1, strat2]
     plt.plot(*strat2.cum_dstr(inverse))
     plt.xlabel("Amount")
