@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-from strats_module import *#Two_Strats
+from scipy.stats import lognorm
+from strats_module import *#Two_Strats # * reimports modules?
 
 # TODO clargs to output compuation time
 # TODO seperate class or methods for computing results analytically instead of
@@ -93,6 +94,15 @@ if __name__ == "__main__":
     pdf = np.exp(-(np.log(x/principle) - mu)**2 / (2 * sigma**2)) \
           / (x/principle * sigma * (2 * np.pi)**0.5) / principle
     plt.plot(x, pdf)
+    sp_pdf = lognorm.pdf(x/principle, sigma, scale=np.exp(mu))
+    #plt.plot(x, sp_pdf)
+    tot_diff = 0
+    for i in range(len(pdf)):
+      diff = pdf[i] - sp_pdf[i]
+      tot_diff += abs(diff)
+      #print(pdf[i]); print(sp_pdf[i], diff)
+    print(tot_diff)
+    #plt.plot(x, lognorm.pdf(x/principle, sigma, scale=np.exp(mu)))
     plt.plot(*strat2.pdf())
     # Funny output if dereference is omitted
     # TODO make ymax a bit greater than the highest point of either PDF.
