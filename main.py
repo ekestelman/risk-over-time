@@ -27,7 +27,8 @@ if __name__ == "__main__":
   params1 = [float(x) for x in params1]
   params2 = [float(x) for x in params2]
   # TODO Default to skipping params2? Use 0 0 to skip? Or X?
-  benchmark = float(input("Choose benchmark APY: ") or 1.0825)
+  benchmark = float(input("Choose benchmark APY: ") or 0.0825)
+  # More standard inputs. Previously 1.0825 is not consistent with other inputs.
   # Will this be treated as APY or APR?
   show = input("What do you want to display?\n" +
                "a) Compare expected value and standard deviation\n" +
@@ -52,7 +53,8 @@ if __name__ == "__main__":
   # Can yearly_plot() still accept sigma=0 strat as argument?
   # TODO exp graph with shaded area of x% confidence interval
   # TODO include growing benchmark in quantile plot
-  benchmark = benchmark**years * principle
+  benchmark = (1+benchmark)**years * principle
+  # 1 + benchmark is more consistent with other inputs.
   if 'e' in show:
     yearly_plot(strat1, strat2, 30, 2)
     strat1.recalc(years)
