@@ -119,6 +119,9 @@ def yearly_plot(strat1, strat2, stop, step, start=0):
     # compare now takes results, not years. years needs to pass through strat obj
     # needs to make new strat object on each loop, or alter existing strat results
   plt.errorbar(years, win, win_sem) 
+  plt.xlabel("Time")
+  plt.ylabel("P(A>B)")
+  plt.title("Probability of A outperforming B")
   plt.show()
   
 class Two_Strats:  # From previous draft---not in use.
@@ -209,6 +212,10 @@ class Strat:
     #plt.show()
 
   def dstr_over_time(self, years=0, normalize=False):
+    # TODO overlay both strats on same graph (interactive: toggle which strat,
+    # which confidence intervals to show)
+    # TODO plot multiple confidence intervals on same plot---gives more insight
+    # into how sharply probabilities change on one side vs other. Like contours.
     if not years:
       years = self.years   # Better way to set default?
     # Default year range to years attribute, option to set different range.
@@ -245,6 +252,9 @@ class Strat:
     #plt.plot(mid)
     #plt.plot(high)
     #plt.plot(low)
+    plt.xlabel("Time")
+    plt.ylabel("Amount")
+    plt.title("Projected Growth Over Time")
     plt.show()
 
 if __name__ == "__main__":

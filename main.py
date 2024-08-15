@@ -28,6 +28,7 @@ if __name__ == "__main__":
   params2 = [float(x) for x in params2]
   # TODO Default to skipping params2? Use 0 0 to skip? Or X?
   benchmark = float(input("Choose benchmark APY: ") or 0.0825)
+  # Need a way to opt out of benchmark (input None? 0 should be a valid entry)
   # More standard inputs. Previously 1.0825 is not consistent with other inputs.
   # Will this be treated as APY or APR?
   show = input("What do you want to display?\n" +
@@ -36,7 +37,7 @@ if __name__ == "__main__":
                "c) Show PDF after time t\n" +
                "d) Show CDF after time t\n" +
                "e) Chance of strat A outperforming strat B over time\n" +
-               "> ")
+               "> ") or "abcde"
   # TODO we can display analyses in order that they are written?
   # TODO initialize strat objects, promt user for mean and std dev (then ask
   # what to display). See when calculations are performed in objects.
@@ -82,7 +83,8 @@ if __name__ == "__main__":
   # Consider interactive plot: toggle curve, nbins.
   # Consider excluding outlying results, consider log plot for long time scales.
   if 'c' in show:
-    plt.hist(strats, 15 * int(strat1.years**0.5), density=True)
+    plt.hist(strats, 15 * int(strat1.years**0.5), density=True, label=["Strat A", "Strat B"])
+    # TODO better labels for hist/pdf
     # TODO chance of being above/below a benchmark for each strat?
     # e.g., better chance that strat 2 > 5% but better chance that strat 1 > 15%.
     # ^CDF plot may basically demonstrate this.
@@ -95,7 +97,7 @@ if __name__ == "__main__":
     mu, sigma = strat1.mu * strat1.years, strat1.sigma * strat1.years**0.5
     pdf = np.exp(-(np.log(x/principle) - mu)**2 / (2 * sigma**2)) \
           / (x/principle * sigma * (2 * np.pi)**0.5) / principle
-    plt.plot(x, pdf)
+    plt.plot(x, pdf, label="Strat A")
     sp_pdf = lognorm.pdf(x/principle, sigma, scale=np.exp(mu))
     #plt.plot(x, sp_pdf)
     tot_diff = 0
@@ -105,10 +107,13 @@ if __name__ == "__main__":
       #print(pdf[i]); print(sp_pdf[i], diff)
     print(tot_diff)
     #plt.plot(x, lognorm.pdf(x/principle, sigma, scale=np.exp(mu)))
-    plt.plot(*strat2.pdf())
+    plt.plot(*strat2.pdf(), label="Strat B")
     # Funny output if dereference is omitted
     # TODO make ymax a bit greater than the highest point of either PDF.
-    plt.vlines(benchmark, 0, 2*max(pdf), color="black", linestyles="--")
+    plt.vlines(benchmark, 0, 2*max(pdf), color="black", linestyles="--", label="Benchmark")
+    plt.title("PDF")
+    plt.xlabel("Amount")
+    plt.legend()
     plt.show()
   #for elm in strats:  # Numerically computed CDF
   #  plt.plot(elm.cum_dstr())
@@ -116,8 +121,8 @@ if __name__ == "__main__":
   # of this statistic.)
   if 'd' in show:
     inverse = True # TODO Prompt user or show both plots?
-    plt.plot(*strat1.cum_dstr(inverse))  # Maybe strats = [strat1, strat2]
-    plt.plot(*strat2.cum_dstr(inverse))
+    plt.plot(*strat1.cum_dstr(inverse), label="Strat A")  # Maybe strats = [strat1, strat2]
+    plt.plot(*strat2.cum_dstr(inverse), label="Strat B")
     plt.xlabel("Amount")
     # Math print for ylabel?
     if inverse:
@@ -125,6 +130,7 @@ if __name__ == "__main__":
     else:
       plt.ylabel("P(<x)")
     plt.vlines(benchmark, 0, 1, color="black", linestyles="--")
+    plt.title("CDF Complement (chance of ending with at least x)")
     plt.show()
 
 
