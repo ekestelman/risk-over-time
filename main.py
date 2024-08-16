@@ -18,12 +18,14 @@ if __name__ == "__main__":
   # TODO another graph can show the ROI for each strat rather than just win rate
   # TODO multiplot to show effect of diff mu, sigma (or plots with diff axes)
   # Consider click library for inputs
+  # TODO print default if no entry
+  # TODO show strat parameters on graphs
   years = int(input("Years (int): ") or 10)
   principle = int(input("Principle (int): ") or 1)
   params1 = (input("Mean and standard deviation (space separated): ") or
-             "0.1 0.15").split()
+             "0.18 0.19").split()
   params2 = (input("Mean and standard deviation (space separated): ") or
-             "0.09 0.1").split()
+             "0.13 0.15").split()
   params1 = [float(x) for x in params1]
   params2 = [float(x) for x in params2]
   # TODO Default to skipping params2? Use 0 0 to skip? Or X?
@@ -131,6 +133,7 @@ if __name__ == "__main__":
       plt.ylabel("P(<x)")
     plt.vlines(benchmark, 0, 1, color="black", linestyles="--")
     plt.title("CDF Complement (chance of ending with at least x)")
+    plt.legend()
     plt.show()
 
 
