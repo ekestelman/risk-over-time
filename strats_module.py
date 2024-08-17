@@ -254,7 +254,9 @@ class Strat:
     #plt.plot(low)
     plt.xlabel("Time")
     plt.ylabel("Amount")
-    plt.title("Projected Growth Over Time")
+    # Consider how title may work if we implement interactive plots
+    plt.title("Projected Growth Over Time\n$\mu = $" + str(self.mu) + \
+              "    $\sigma$ = " + str(self.sigma))
     plt.show()
 
 if __name__ == "__main__":

@@ -13,6 +13,9 @@ from strats_module import *#Two_Strats # * reimports modules?
 # TODO Prompt user for main args, prompt for desired graph(s), loop until exited
 # (store objects to avoid recomputation? --won't work currently for yearly plot,
 # may not matter much for analytical calculation.)
+# TODO Inputs like: I want minimum p chance of a amount/r rate in t time (output
+# best strat) or p chance of a amount (output time for each strat) or a amount in
+# t time (output chance).
 
 if __name__ == "__main__":
   # TODO another graph can show the ROI for each strat rather than just win rate
@@ -28,6 +31,8 @@ if __name__ == "__main__":
              "0.13 0.15").split()
   params1 = [float(x) for x in params1]
   params2 = [float(x) for x in params2]
+  # FIXME mu and sigma are set for log of the lognormal, not the lognormal itself
+  # Additional validation: compute mu, sigma of distribution
   # TODO Default to skipping params2? Use 0 0 to skip? Or X?
   benchmark = float(input("Choose benchmark APY: ") or 0.0825)
   # Need a way to opt out of benchmark (input None? 0 should be a valid entry)
@@ -50,9 +55,12 @@ if __name__ == "__main__":
   #strat2 = Strat(.09, .1, years=years, principle=principle)
   strat2 = Strat(*params2, years=years, principle=principle)
   #strat2.print_summary()
+  labelA = "$\mu=$"+str(strat1.mu)+", $\sigma=$"+str(strat1.sigma) #"Strat A"
+  labelB = "$\mu=$"+str(strat2.mu)+", $\sigma=$"+str(strat2.sigma) #"Strat B"
   if 'a' in show:
     compare(strat1.roi_dstr, strat2.roi_dstr, summary=True)
   # TODO Add function analogous to compare/summary for benchmark.
+  # TODO Show yearly mean for verification?
   # Can yearly_plot() still accept sigma=0 strat as argument?
   # TODO exp graph with shaded area of x% confidence interval
   # TODO include growing benchmark in quantile plot
@@ -85,7 +93,7 @@ if __name__ == "__main__":
   # Consider interactive plot: toggle curve, nbins.
   # Consider excluding outlying results, consider log plot for long time scales.
   if 'c' in show:
-    plt.hist(strats, 15 * int(strat1.years**0.5), density=True, label=["Strat A", "Strat B"])
+    plt.hist(strats, 15 * int(strat1.years**0.5), density=True, label=[labelA, labelB])
     # TODO better labels for hist/pdf
     # TODO chance of being above/below a benchmark for each strat?
     # e.g., better chance that strat 2 > 5% but better chance that strat 1 > 15%.
@@ -99,7 +107,7 @@ if __name__ == "__main__":
     mu, sigma = strat1.mu * strat1.years, strat1.sigma * strat1.years**0.5
     pdf = np.exp(-(np.log(x/principle) - mu)**2 / (2 * sigma**2)) \
           / (x/principle * sigma * (2 * np.pi)**0.5) / principle
-    plt.plot(x, pdf, label="Strat A")
+    plt.plot(x, pdf, label=labelA)
     sp_pdf = lognorm.pdf(x/principle, sigma, scale=np.exp(mu))
     #plt.plot(x, sp_pdf)
     tot_diff = 0
@@ -109,7 +117,7 @@ if __name__ == "__main__":
       #print(pdf[i]); print(sp_pdf[i], diff)
     print(tot_diff)
     #plt.plot(x, lognorm.pdf(x/principle, sigma, scale=np.exp(mu)))
-    plt.plot(*strat2.pdf(), label="Strat B")
+    plt.plot(*strat2.pdf(), label=labelB)
     # Funny output if dereference is omitted
     # TODO make ymax a bit greater than the highest point of either PDF.
     plt.vlines(benchmark, 0, 2*max(pdf), color="black", linestyles="--", label="Benchmark")
@@ -123,8 +131,8 @@ if __name__ == "__main__":
   # of this statistic.)
   if 'd' in show:
     inverse = True # TODO Prompt user or show both plots?
-    plt.plot(*strat1.cum_dstr(inverse), label="Strat A")  # Maybe strats = [strat1, strat2]
-    plt.plot(*strat2.cum_dstr(inverse), label="Strat B")
+    plt.plot(*strat1.cum_dstr(inverse), label=labelA)  # Maybe strats = [strat1, strat2]
+    plt.plot(*strat2.cum_dstr(inverse), label=labelB)
     plt.xlabel("Amount")
     # Math print for ylabel?
     if inverse:
