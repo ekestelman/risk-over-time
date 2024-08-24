@@ -31,6 +31,10 @@ if __name__ == "__main__":
              "0.13 0.15").split()
   params1 = [float(x) for x in params1]
   params2 = [float(x) for x in params2]
+  params1[0] = get_mu(*params1)
+  params1[1] = get_sig(*params1)
+  params2[0] = get_mu(*params2)
+  params2[1] = get_sig(*params2)
   # FIXME mu and sigma are set for log of the lognormal, not the lognormal itself
   # Additional validation: compute mu, sigma of distribution
   # TODO Default to skipping params2? Use 0 0 to skip? Or X?

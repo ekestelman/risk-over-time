@@ -1,6 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+from scipy.stats import sem
+
+def get_mu(mu_x, sig_x):
+  #mu = np.log(mu_x**2 / (mu_x**2 + sig_x**2)**0.5)
+  # Truly want the inverse of this
+  mu = np.log(1+mu_x)  # Temporary fix, verify math
+  return mu
+
+def get_sig(mu_x, sig_x):
+  #sig = (np.log(1 + sig_x**2 / mu_x**2)) ** 0.5
+  sig = np.log(1+sig_x) # Temporary fix, verify math
+  return sig
 
 def roi_dstr(years, mu, sigma, trials=10000, principle=1e3):
 # Distribution of possible returns on investment.
@@ -22,7 +34,14 @@ def roi_dstr(years, mu, sigma, trials=10000, principle=1e3):
   return results
 
 # XXX Get rid of this, integrate it into print_summary()
-def summarize(results):
+def summarize(results, years = None):
+  # Should pass entire object so we can print mu and std?
+  # ^No need if we just have this as a class method
+  if years:
+    pass
+    yearly_roi = [x ** (1 / years) for x in results] # Need to know nyears
+    print(np.mean(yearly_roi), "+/-")
+    # Note if mean changes over time? or consider if median is more meaningful.
   summary = {
              "mean" : np.mean(results),
              "std_biased" : np.std(results),
@@ -155,7 +174,7 @@ class Strat:
     # Can roi_dstr be optional in init? Want to initialize object before
     # deciding years
     self.roi_dstr = roi_dstr(years, mu, sigma, trials, principle)
-    self.summary = summarize(self.roi_dstr)
+    self.summary = summarize(self.roi_dstr, self.years)
     # ^Should this be a method?
 
   def print_summary(self):
