@@ -23,6 +23,7 @@ if __name__ == "__main__":
   # Consider click library for inputs
   # TODO print default if no entry
   # TODO show strat parameters on graphs
+  # TODO round plot labels
   years = int(input("Years (int): ") or 10)
   principle = int(input("Principle (int): ") or 1)
   params1 = (input("Mean and standard deviation (space separated): ") or
@@ -59,8 +60,9 @@ if __name__ == "__main__":
   #strat2 = Strat(.09, .1, years=years, principle=principle)
   strat2 = Strat(*params2, years=years, principle=principle)
   #strat2.print_summary()
-  labelA = "$\mu=$"+str(strat1.mu)+", $\sigma=$"+str(strat1.sigma) #"Strat A"
-  labelB = "$\mu=$"+str(strat2.mu)+", $\sigma=$"+str(strat2.sigma) #"Strat B"
+  labelA = "$\mu=$"+str(round(strat1.mu,4))+", $\sigma=$"+str(round(strat1.sigma,4)) #"Strat A"
+  labelB = "$\mu=$"+str(round(strat2.mu,4))+", $\sigma=$"+str(round(strat2.sigma,4)) #"Strat B"
+  # Consider moving labels to class attribute
   if 'a' in show:
     compare(strat1.roi_dstr, strat2.roi_dstr, summary=True)
   # TODO Add function analogous to compare/summary for benchmark.

@@ -7,11 +7,14 @@ def get_mu(mu_x, sig_x):
   #mu = np.log(mu_x**2 / (mu_x**2 + sig_x**2)**0.5)
   # Truly want the inverse of this
   mu = np.log(1+mu_x)  # Temporary fix, verify math
+  # This mu_x corresponds to mu*-1 on lognormal wikipedia page:
+  # mu_x + 1 should be the median of the lognormal
   return mu
 
 def get_sig(mu_x, sig_x):
   #sig = (np.log(1 + sig_x**2 / mu_x**2)) ** 0.5
   sig = np.log(1+sig_x) # Temporary fix, verify math
+  # This sig_x should correspond to sig* on lognormal wikipedia page.
   return sig
 
 def roi_dstr(years, mu, sigma, trials=10000, principle=1e3):
@@ -40,7 +43,8 @@ def summarize(results, years = None):
   if years:
     pass
     yearly_roi = [x ** (1 / years) for x in results] # Need to know nyears
-    print(np.mean(yearly_roi), "+/-")
+    print("Mean: ", np.mean(yearly_roi), "+/-")
+    print("Median: ", np.median(yearly_roi))
     # Note if mean changes over time? or consider if median is more meaningful.
   summary = {
              "mean" : np.mean(results),
@@ -274,8 +278,8 @@ class Strat:
     plt.xlabel("Time")
     plt.ylabel("Amount")
     # Consider how title may work if we implement interactive plots
-    plt.title("Projected Growth Over Time\n$\mu = $" + str(self.mu) + \
-              "    $\sigma$ = " + str(self.sigma))
+    plt.title("Projected Growth Over Time\n$\mu = $" + str(round(self.mu,4)) + \
+              "    $\sigma$ = " + str(round(self.sigma,4)))
     plt.show()
 
 if __name__ == "__main__":
