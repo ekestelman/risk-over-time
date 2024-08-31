@@ -22,8 +22,6 @@ if __name__ == "__main__":
   # TODO multiplot to show effect of diff mu, sigma (or plots with diff axes)
   # Consider click library for inputs
   # TODO print default if no entry
-  # TODO show strat parameters on graphs
-  # TODO round plot labels
   years = int(input("Years (int): ") or 10)
   principle = int(input("Principle (int): ") or 1)
   params1 = (input("Mean and standard deviation (space separated): ") or
@@ -32,14 +30,12 @@ if __name__ == "__main__":
              "0.13 0.15").split()
   params1 = [float(x) for x in params1]
   params2 = [float(x) for x in params2]
-  params1[0] = get_mu(*params1)
-  params1[1] = get_sig(*params1)
-  params2[0] = get_mu(*params2)
-  params2[1] = get_sig(*params2)
-  # FIXME mu and sigma are set for log of the lognormal, not the lognormal itself
+  # Labels may be better kept as the input values, representing median.
+  # XXX mu and sigma are set for log of the lognormal, not the lognormal itself
   # Additional validation: compute mu, sigma of distribution
   # TODO Default to skipping params2? Use 0 0 to skip? Or X?
   benchmark = float(input("Choose benchmark APY: ") or 0.0825)
+  # TODO label for benchmark on graphs
   # Need a way to opt out of benchmark (input None? 0 should be a valid entry)
   # More standard inputs. Previously 1.0825 is not consistent with other inputs.
   # Will this be treated as APY or APR?
@@ -60,8 +56,6 @@ if __name__ == "__main__":
   #strat2 = Strat(.09, .1, years=years, principle=principle)
   strat2 = Strat(*params2, years=years, principle=principle)
   #strat2.print_summary()
-  labelA = "$\mu=$"+str(round(strat1.mu,4))+", $\sigma=$"+str(round(strat1.sigma,4)) #"Strat A"
-  labelB = "$\mu=$"+str(round(strat2.mu,4))+", $\sigma=$"+str(round(strat2.sigma,4)) #"Strat B"
   # Consider moving labels to class attribute
   if 'a' in show:
     compare(strat1.roi_dstr, strat2.roi_dstr, summary=True)
@@ -99,7 +93,8 @@ if __name__ == "__main__":
   # Consider interactive plot: toggle curve, nbins.
   # Consider excluding outlying results, consider log plot for long time scales.
   if 'c' in show:
-    plt.hist(strats, 15 * int(strat1.years**0.5), density=True, label=[labelA, labelB])
+    plt.hist(strats, 15 * int(strat1.years**0.5), density=True, \
+             label=[strat1.label, strat2.label])
     # TODO better labels for hist/pdf
     # TODO chance of being above/below a benchmark for each strat?
     # e.g., better chance that strat 2 > 5% but better chance that strat 1 > 15%.
@@ -113,7 +108,7 @@ if __name__ == "__main__":
     mu, sigma = strat1.mu * strat1.years, strat1.sigma * strat1.years**0.5
     pdf = np.exp(-(np.log(x/principle) - mu)**2 / (2 * sigma**2)) \
           / (x/principle * sigma * (2 * np.pi)**0.5) / principle
-    plt.plot(x, pdf, label=labelA)
+    plt.plot(x, pdf, label=strat1.label)
     sp_pdf = lognorm.pdf(x/principle, sigma, scale=np.exp(mu))
     #plt.plot(x, sp_pdf)
     tot_diff = 0
@@ -123,7 +118,7 @@ if __name__ == "__main__":
       #print(pdf[i]); print(sp_pdf[i], diff)
     print(tot_diff)
     #plt.plot(x, lognorm.pdf(x/principle, sigma, scale=np.exp(mu)))
-    plt.plot(*strat2.pdf(), label=labelB)
+    plt.plot(*strat2.pdf(), label=strat2.label)
     # Funny output if dereference is omitted
     # TODO make ymax a bit greater than the highest point of either PDF.
     plt.vlines(benchmark, 0, 2*max(pdf), color="black", linestyles="--", label="Benchmark")
@@ -137,8 +132,8 @@ if __name__ == "__main__":
   # of this statistic.)
   if 'd' in show:
     inverse = True # TODO Prompt user or show both plots?
-    plt.plot(*strat1.cum_dstr(inverse), label=labelA)  # Maybe strats = [strat1, strat2]
-    plt.plot(*strat2.cum_dstr(inverse), label=labelB)
+    plt.plot(*strat1.cum_dstr(inverse), label=strat1.label)  # Maybe strats = [strat1, strat2]
+    plt.plot(*strat2.cum_dstr(inverse), label=strat2.label)
     plt.xlabel("Amount")
     # Math print for ylabel?
     if inverse:

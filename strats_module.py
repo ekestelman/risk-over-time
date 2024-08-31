@@ -14,7 +14,7 @@ def get_mu(mu_x, sig_x):
 def get_sig(mu_x, sig_x):
   #sig = (np.log(1 + sig_x**2 / mu_x**2)) ** 0.5
   sig = np.log(1+sig_x) # Temporary fix, verify math
-  # This sig_x should correspond to sig* on lognormal wikipedia page.
+  # This sig_x should correspond to sig*-1 on lognormal wikipedia page.
   return sig
 
 def roi_dstr(years, mu, sigma, trials=10000, principle=1e3):
@@ -169,8 +169,12 @@ class Strat:
   # TODO method to plot pdf, cdf, etc. along with another strat object passed
   # as arg
   def __init__(self, mu, sigma=0, years=1, principle=1e3, trials=10000):
-    self.mu = mu
-    self.sigma = sigma
+    self.mu_star = mu  # Median
+    self.sig_star = sigma  # Scatter?
+    self.mu = get_mu(mu, sigma)
+    self.sigma = get_sig(mu, sigma)
+    #self.mu = mu
+    #self.sigma = sigma
     self.years = years
     self.principle = principle
     self.trials = trials
@@ -180,6 +184,7 @@ class Strat:
     self.roi_dstr = roi_dstr(years, mu, sigma, trials, principle)
     self.summary = summarize(self.roi_dstr, self.years)
     # ^Should this be a method?
+    self.label = "$\mu *=$"+str(mu)+", $\sigma *=$"+str(sigma)
 
   def print_summary(self):
     print_summary(self.summary)
@@ -278,8 +283,8 @@ class Strat:
     plt.xlabel("Time")
     plt.ylabel("Amount")
     # Consider how title may work if we implement interactive plots
-    plt.title("Projected Growth Over Time\n$\mu = $" + str(round(self.mu,4)) + \
-              "    $\sigma$ = " + str(round(self.sigma,4)))
+    plt.title("Projected Growth Over Time\n$\mu *= $" + str(round(self.mu_star,4)) + \
+              "    $\sigma *$ = " + str(round(self.sig_star,4)))
     plt.show()
 
 if __name__ == "__main__":
