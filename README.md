@@ -22,11 +22,11 @@ We can model investment growth using geometric Brownian motion where the yearly 
 
 ## A note on parameters
 
-The program prompts the user for the mean and standard deviation of each investment under consideration. However, the program currently treats these inputs as $\mu^*$ and $\sigma^*$ respectively.
+The program prompts the user for the mean and standard deviation of each investment under consideration. However, the program currently treats these inputs as $`\mu^*`$ and $`\sigma^*`$ respectively.
 
 $\mu^*$ is defined as the median of the lognormal distribution.
 
-$\siga^*$ is defined such that the interval $[\mu^*/\sigma^*,\mu^*\cdot\sigma^*]$ contains 68% of the probability.
+$`\sigma^*`$ is defined such that the interval $`[\mu^*/\sigma^*,\mu^*\cdot\sigma^*]`$ contains 68% of the probability.
 
 ## Screenshots
 
